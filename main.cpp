@@ -9,25 +9,29 @@
     #define _UNIX 1
 #endif
 
-int main() {
+int main(int argc, char* argv[]) {
     std::string directory;
     std::string file_name;
 
-    std::cout << "Enter a directory to search and then a file to search for." << std::endl;
+    if (argc == 3) {
+        directory = std::string(argv[1]);
+        file_name = std::string(argv[2]);
+    } else {
+        std::cout << "Enter a directory to search and then a file to search for." << std::endl;
 
-    std::cout << "Enter directory" << std::endl;
-    std::cout << "Use / to depict the root directory" << std::endl;
-    std::cout << "Use ./ to depict the current directory" << std::endl;
-    std::cout << "Use ~/ to depict the home directory" << std::endl;
-    std::cout << std::endl << "> ";
-    std::cin >> directory;
-    std::cout << std::endl;
+        std::cout << "Enter directory" << std::endl;
+        std::cout << "Use / to depict the root directory" << std::endl;
+        std::cout << "Use ./ to depict the current directory" << std::endl;
+        std::cout << "Use ~/ to depict the home directory" << std::endl;
+        std::cout << std::endl << "> ";
+        std::cin >> directory;
+        std::cout << std::endl;
 
-    std::cout << "Enter filename";
-    std::cout << std::endl << "> ";
-    std::cin >> file_name;
-    std::cout << std::endl;
-
+        std::cout << "Enter filename";
+        std::cout << std::endl << "> ";
+        std::cin >> file_name;
+        std::cout << std::endl;
+    }
 
     if (directory.size() >= 2 && directory[0] == '~' && directory[1] == '/') {
 #if defined(_WINDOWS)
@@ -39,10 +43,16 @@ int main() {
 #endif
     }
 
-    for (auto& entry : std::filesystem::recursive_directory_iterator(directory, std::filesystem::directory_options::skip_permission_denied)) {
-        if (entry.path().filename() == file_name) {
-            std::cout << entry << std::endl;
+    try {
+        for (auto& entry : std::filesystem::recursive_directory_iterator(directory, std::filesystem::directory_options::skip_permission_denied)) {
+            if (entry.path().filename() == file_name) {
+                std::cout << entry << std::endl;
+            }
         }
+    }
+    catch (const std::exception& exc)
+    {
+        std::cerr << exc.what();
     }
 
     return 0;
