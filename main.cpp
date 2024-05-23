@@ -52,14 +52,17 @@ int main(int argc, char* argv[]) {
         directories.pop_back();
         
         try{
-            for(auto& entry : std::filesystem::directory_iterator(directory, std::filesystem::directory_options::skip_permission_denied)){
+            for(auto& entry : std::filesystem::directory_iterator(dir, std::filesystem::directory_options::skip_permission_denied)){
+                if(entry.is_directory() && !entry.is_symlink()){
                 directories.push_back(entry.path());
+                }
                 if(entry.path().filename() == file_name || file_name == "*"){
                     std::cout << entry << std::endl;
                 }
             }
         }catch(const std::exception& exc){
-            std::cerr << exc.what();
+            // std::cerr << exc.what();
+            std::cout << "Access to " << dir << " denied." << std::endl;
         }
     }
 
