@@ -35,25 +35,49 @@ int main(int argc, char* argv[]) {
 
     if (directory.size() >= 2 && directory[0] == '~' && directory[1] == '/') {
 #if defined(_WINDOWS)
-        std::string home_path = std::getenv("HOMEPATH");
-        std::string home_drive = std::getenv("HOMEDRIVE");
+        std::string home_path = std::getenv("HOMEPATH");        std::string home_drive = std::getenv("HOMEDRIVE");
         directory = home_drive + home_path + directory.substr(1);
 #elif defined(_UNIX)
         directory = std::getenv("HOME") + directory.substr(1);
 #endif
     }
 
-    try {
-        for (auto& entry : std::filesystem::recursive_directory_iterator(directory, std::filesystem::directory_options::skip_permission_denied)) {
-            if (entry.path().filename() == file_name) {
-                std::cout << entry << std::endl;
+    std::vector<std::string> directories;
+    
+    directories.push_back(directory);
+
+    while(!directories.empty()) {
+        auto dir = directories[directories.size()-1];
+        
+        directories.pop_back();
+        
+        try{
+            for(auto& entry : std::filesystem::directory_iterator(directory, std::filesystem::directory_options::skip_permission_denied)){
+                directories.push_back(entry.path());
+                if(entry.path().filename() == file_name || file_name == "*"){
+                    std::cout << entry << std::endl;
+                }
             }
+        }catch(const std::exception& exc){
+            std::cerr << exc.what();
         }
-    }
-    catch (const std::exception& exc)
-    {
-        std::cerr << exc.what();
     }
 
     return 0;
 }
+
+
+// void eghhhhhhhh(){
+    
+//     try {
+//         for (auto& entry : std::filesystem::recursive_directory_iterator(directory, std::filesystem::directory_options::skip_permission_denied)) {
+//             if (entry.path().filename() == file_name) {
+//                 std::cout << entry << std::endl;
+//             }
+//         }
+//     }
+//     catch (const std::exception& exc)
+//     {
+//         std::cerr << exc.what();
+//     }
+// }
